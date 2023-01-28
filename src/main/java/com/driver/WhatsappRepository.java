@@ -77,10 +77,7 @@ public class WhatsappRepository {
         // The 'i^th' created message has message id 'i'.
         // Return the message id.
         messageId++;
-        Date date = new Date();
-        SimpleDateFormat formatter = new SimpleDateFormat("dd/MM/yy");
-        String str = formatter.format(date);
-        System.out.print("Current date: "+str);
+
         Message message = new Message(messageId,content,new Date());
 
         messagedb.put(messageId,message);
@@ -92,37 +89,49 @@ public class WhatsappRepository {
         //Throw "Group does not exist" if the mentioned group does not exist
         //Throw "You are not allowed to send message" if the sender is not a member of the group
         //If the message is sent successfully, return the final number of messages in that group.
-       int flag=0;
-       Group group2 = new Group();
-        for(Group group1: groupUserMap.keySet()){
-            if(Objects.equals(group1.getName(), group.getName())){
-                flag=1;
-                break;
-            }
-        }
-        if(flag==0){
+        if(!groupUserMap.containsKey(group)){
             throw new Exception("Group does not exist");
         }
-        int flag2=0;
-        for(User user1 : groupUserMap.get(group)){
-            if(Objects.equals(user1.getName(), sender.getName())){
-                flag2=1;
-                break;
-            }
-        }
-        if(flag2==0){
+        if(!isUserAlreadyExisted(group,sender)){
             throw new Exception("You are not allowed to send message");
         }
-        for(Group group1: groupMessageMap.keySet()){
-            if(Objects.equals(group1.getName(),group.getName())){
-                List<Message> list1 = new ArrayList<>(groupMessageMap.get(group1));
-                list1.add(message);
-                groupMessageMap.put(group1,list1);
-                group2 = group1;
-
-            }
+        if(groupMessageMap.containsKey(group)){
+            List<Message> lis = groupMessageMap.get(group);
+            lis.add(message);
+            groupMessageMap.put(group,lis);
         }
-        return groupMessageMap.get(group2).size();
+        return groupMessageMap.get(group).size();
+//       int flag=0;
+//       Group group2 = new Group();
+//        for(Group group1: groupUserMap.keySet()){
+//            if(Objects.equals(group1.getName(), group.getName())){
+//                flag=1;
+//                break;
+//            }
+//        }
+//        if(flag==0){
+//            throw new Exception("Group does not exist");
+//        }
+//        int flag2=0;
+//        for(User user1 : groupUserMap.get(group)){
+//            if(Objects.equals(user1.getName(), sender.getName())){
+//                flag2=1;
+//                break;
+//            }
+//        }
+//        if(flag2==0){
+//            throw new Exception("You are not allowed to send message");
+//        }
+//        for(Group group1: groupMessageMap.keySet()){
+//            if(Objects.equals(group1.getName(),group.getName())){
+//                List<Message> list1 = new ArrayList<>(groupMessageMap.get(group1));
+//                list1.add(message);
+//                groupMessageMap.put(group1,list1);
+//                group2 = group1;
+//
+//            }
+//        }
+//        return groupMessageMap.get(group2).size();
 //        List<Message> list1 = new ArrayList<>();
 //        list1.add(message);
 //        groupMessageMap.put(group,list1);
@@ -135,34 +144,50 @@ public class WhatsappRepository {
         //Throw "User is not a participant" if the user is not a part of the group
         //Change the admin of the group to "user" and return "SUCCESS". Note that at one time there is only one admin and the admin rights are transferred from approver to user.
 
-        int flag=0;
-        for(Group group1: groupUserMap.keySet()){
-            if(Objects.equals(group1.getName(), group.getName())){
-                flag=1;
-                break;
-            }
-        }
-        if(flag==0){
-            throw new Exception("Group does not exist");
-        }
-        int flag2=0;
-        for(Group group1 : adminMap.keySet()){
-            User user1 = adminMap.get(group1);
-         if(Objects.equals(group1.getName(),group.getName()) && Objects.equals(user1.getName(),approver.getName())){
-             flag2=1;
-             break;
-         }
+        if(!groupUserMap.containsKey(group)) throw new Exception("Group does not exist");
+        if(!adminMap.get(group).equals(approver)) throw new Exception("Approver does not have rights");
+        if(!this.isUserAlreadyExisted(group, user)) throw  new Exception("User is not a participant");
 
-        }
-        if(flag2==0){
-            throw new Exception("Approver does not have rights");
-        }
-        for(Group group1 : adminMap.keySet()){
-            if(Objects.equals(group1.getName(),group.getName())){
-                adminMap.put(group1,user);
+        adminMap.put(group, user);
+        return "SUCCESS";
+//        int flag=0;
+//        for(Group group1: groupUserMap.keySet()){
+//            if(Objects.equals(group1.getName(), group.getName())){
+//                flag=1;
+//                break;
+//            }
+//        }
+//        if(flag==0){
+//            throw new Exception("Group does not exist");
+//        }
+//        int flag2=0;
+//        for(Group group1 : adminMap.keySet()){
+//            User user1 = adminMap.get(group1);
+//         if(Objects.equals(group1.getName(),group.getName()) && Objects.equals(user1.getName(),approver.getName())){
+//             flag2=1;
+//             break;
+//         }
+//
+//        }
+//        if(flag2==0){
+//            throw new Exception("Approver does not have rights");
+//        }
+//        for(Group group1 : adminMap.keySet()){
+//            if(Objects.equals(group1.getName(),group.getName())){
+//                adminMap.put(group1,user);
+//            }
+//        }
+//        return "SUCCESS";
+    }
+
+    public boolean isUserAlreadyExisted(Group group,User user){
+        List<User> lis = groupUserMap.get(group);
+        for(int i=0;i<lis.size();i++){
+            if(lis.get(i).getName()==user.getName()){
+                return true;
             }
         }
-        return "SUCCESS";
+        return false;
     }
 
 
