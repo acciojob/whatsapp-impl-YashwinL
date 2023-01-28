@@ -1,5 +1,6 @@
 package com.driver;
 
+import java.text.SimpleDateFormat;
 import java.time.LocalDate;
 import java.util.*;
 
@@ -75,7 +76,12 @@ public class WhatsappRepository {
         // The 'i^th' created message has message id 'i'.
         // Return the message id.
         messageId++;
+        Date date = new Date();
+        SimpleDateFormat formatter = new SimpleDateFormat("dd/MM/yy");
+        String str = formatter.format(date);
+        System.out.print("Current date: "+str);
         Message message = new Message(messageId,content,new Date());
+
         messagedb.put(messageId,message);
         return messageId;
     }
