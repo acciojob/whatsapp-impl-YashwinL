@@ -92,6 +92,7 @@ public class WhatsappRepository {
         //Throw "You are not allowed to send message" if the sender is not a member of the group
         //If the message is sent successfully, return the final number of messages in that group.
        int flag=0;
+       Group group2 = new Group();
         for(Group group1: groupUserMap.keySet()){
             if(Objects.equals(group1.getName(), group.getName())){
                 flag=1;
@@ -111,16 +112,20 @@ public class WhatsappRepository {
         if(flag2==0){
             throw new Exception("You are not allowed to send message");
         }
-        if(groupMessageMap.containsKey(group)){
-            List<Message> list1 = new ArrayList<>(groupMessageMap.get(group));
-            list1.add(message);
-            groupMessageMap.put(group,list1);
-            return groupMessageMap.get(group).size();
+        for(Group group1: groupMessageMap.keySet()){
+            if(Objects.equals(group1.getName(),group.getName())){
+                List<Message> list1 = new ArrayList<>(groupMessageMap.get(group1));
+                list1.add(message);
+                groupMessageMap.put(group1,list1);
+                group2 = group1;
+
+            }
         }
-        List<Message> list1 = new ArrayList<>();
-        list1.add(message);
-        groupMessageMap.put(group,list1);
-        return groupMessageMap.get(group).size();
+        return groupMessageMap.get(group2).size();
+//        List<Message> list1 = new ArrayList<>();
+//        list1.add(message);
+//        groupMessageMap.put(group,list1);
+//        return groupMessageMap.get(group).size();
     }
 
     public String changeAdmin(User approver, User user, Group group) throws Exception{
