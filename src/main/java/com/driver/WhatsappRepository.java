@@ -95,12 +95,13 @@ public class WhatsappRepository {
         if(!isUserAlreadyExisted(group,sender)){
             throw new Exception("You are not allowed to send message");
         }
+        List<Message> lis =new ArrayList<>();
         if(groupMessageMap.containsKey(group)){
-            List<Message> lis = groupMessageMap.get(group);
-            lis.add(message);
-            groupMessageMap.put(group,lis);
+            lis = groupMessageMap.get(group);
         }
-        return groupMessageMap.get(group).size();
+        lis.add(message);
+        groupMessageMap.put(group,lis);
+        return lis.size();
 //       int flag=0;
 //       Group group2 = new Group();
 //        for(Group group1: groupUserMap.keySet()){
